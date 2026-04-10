@@ -25,27 +25,28 @@ jobs:
           java-version: '17'
           cache: gradle
 
-      - name: Prepare Android SDK
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: tools platform-tools
+
+      - name: Install Android platform packages
         shell: bash
         run: |
           set -euo pipefail
-          ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
-          if [ -z "${ANDROID_SDK_ROOT}" ]; then
-            echo "ANDROID_SDK_ROOT is not set"
-            exit 1
-          fi
-
-          SDKMANAGER="${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager"
-          if [ ! -x "${SDKMANAGER}" ]; then
-            SDKMANAGER="${ANDROID_SDK_ROOT}/cmdline-tools/bin/sdkmanager"
-          fi
-
-          yes | "${SDKMANAGER}" --licenses > /dev/null || true
-          "${SDKMANAGER}" \
-            "platform-tools" \
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager \
             "platforms;android-35" \
             "build-tools;35.0.0"
 
+      - name: Write local.properties
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${ANDROID_SDK_ROOT:-}" ]; then
+            echo "ANDROID_SDK_ROOT is not set"
+            exit 1
+          fi
           echo "sdk.dir=${ANDROID_SDK_ROOT}" > local.properties
 
       - name: Grant execute permission for gradlew
@@ -54,9 +55,8 @@ jobs:
       - name: Build artifacts
         run: |
           ./gradlew \
-            :apk-ui-parse-core:build \
             :apk-ui-parse-android:assembleRelease \
-            :apk-ui-parse-android:exportReleaseJar \
+            :apk-ui-parse-core:test \
             :apk-ui-parse-sample:assembleDebug
 
       - name: Upload build artifacts
@@ -66,7 +66,5 @@ jobs:
           if-no-files-found: error
           retention-days: 14
           path: |
-            apk-ui-parse-core/build/libs/*.jar
-            apk-ui-parse-android/build/libs/*.jar
-            apk-ui-parse-android/build/outputs/aar/*.aar
-            apk-ui-parse-sample/build/outputs/apk/debug/*.apk
+            apk-ui-parse-android/build/outputs/aar/apk-ui-parse-android-release.aar
+            apk-ui-parse-sample/build/outputs/apk/debug/apk-ui-parse-sample-debug.apk

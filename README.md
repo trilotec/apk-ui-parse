@@ -75,7 +75,6 @@ This module is not the main product.
 - Accessibility-based cross-app inspection
 - Floating overlay inspector in the sample app
 - Save and share JSON from the sample app
-- GitHub Actions build and release workflows
 
 ## Output Model
 
@@ -110,12 +109,10 @@ sdk.dir=/path/to/Android/Sdk
 
 ## Build
 
-Build the main artifacts:
+Build the public deliverables:
 
 ```powershell
-./gradlew :apk-ui-parse-core:jar
 ./gradlew :apk-ui-parse-android:assembleRelease
-./gradlew :apk-ui-parse-android:exportReleaseJar
 ./gradlew :apk-ui-parse-sample:assembleDebug
 ```
 
@@ -125,42 +122,6 @@ Run unit tests:
 ./gradlew :apk-ui-parse-core:test
 ```
 
-Publish to the local Maven repository:
-
-```powershell
-./gradlew :apk-ui-parse-core:publishReleasePublicationToMavenLocal
-./gradlew :apk-ui-parse-android:publishReleasePublicationToMavenLocal
-```
-
-Publish to the local build repo under `build/maven-repo`:
-
-```powershell
-./gradlew publishReleasePublicationToLocalBuildRepoRepository
-```
-
-## Release Assets
-
-The GitHub release workflow uploads:
-
-- `apk-ui-parse-core.jar`
-- `apk-ui-parse-core-sources.jar`
-- `apk-ui-parse-core-javadoc.jar`
-- `apk-ui-parse-android-release.aar`
-- `apk-ui-parse-android-classes.jar`
-- `apk-ui-parse-sample-debug.apk`
-
-Workflow files:
-
-- [build.yml](.github/workflows/build.yml)
-- [release.yml](.github/workflows/release.yml)
-
-Push a tag to trigger a release:
-
-```powershell
-git tag v0.1.0
-git push origin v0.1.0
-```
-
 ## Integration Notes
 
 For actual Android app integration:
@@ -168,13 +129,6 @@ For actual Android app integration:
 - prefer `apk-ui-parse-android` as an `aar` or source module
 - use `apk-ui-parse-core` as a `jar` when you only need the models/export layer
 - make sure the host app declares the accessibility service and required XML metadata when not consuming the Android module as an `aar`
-
-Current Gradle publication coordinates:
-
-```text
-com.github.apk-ui-parse:apk-ui-parse-core:0.1.0-SNAPSHOT
-com.github.apk-ui-parse:apk-ui-parse-android:0.1.0-SNAPSHOT
-```
 
 ## Sample App
 
