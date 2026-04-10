@@ -105,7 +105,7 @@ Exact field coverage depends on Android API level and what the foreground app ex
 Optional local SDK file:
 
 ```properties
-sdk.dir=D:\\AndroidSdk
+sdk.dir=/path/to/Android/Sdk
 ```
 
 ## Build

@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import subprocess
 import sys
@@ -8,8 +9,28 @@ import urllib.request
 
 
 APPIUM_SERVER = "http://127.0.0.1:4723"
-DEVICE_SERIAL = "19131FDF6000B7"
 SAMPLE_PACKAGE = "com.apkparse.sample"
+
+
+def resolve_device_serial():
+    explicit_serial = os.environ.get("ANDROID_SERIAL")
+    if explicit_serial:
+        return explicit_serial
+
+    completed = subprocess.run(["adb", "devices"], check=True, capture_output=True, text=False)
+    output = completed.stdout.decode("utf-8", errors="replace").splitlines()
+    serials = []
+    for line in output[1:]:
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split()
+        if len(parts) >= 2 and parts[1] == "device":
+            serials.append(parts[0])
+
+    if len(serials) != 1:
+        raise RuntimeError("Set ANDROID_SERIAL or connect exactly one Android device")
+    return serials[0]
 
 
 def request_json(method, path, payload=None):
@@ -23,7 +44,7 @@ def request_json(method, path, payload=None):
 
 
 def run_adb(*args):
-    command = ["adb", "-s", DEVICE_SERIAL] + list(args)
+    command = ["adb", "-s", resolve_device_serial()] + list(args)
     completed = subprocess.run(command, check=True, capture_output=True, text=False)
     return completed.stdout.decode("utf-8", errors="replace").strip()
 
@@ -150,7 +171,7 @@ def wait_for_text(session_id, text, timeout_seconds=20):
 
 def dismiss_known_dialogs(session_id):
     for _ in range(3):
-        ok_button = find_optional_element(session_id, "xpath", "//*[@resource-id='android:id/button1' or @text='确定']")
+        ok_button = find_optional_element(session_id, "xpath", "//*[@resource-id='android:id/button1']")
         if not ok_button:
             return
         click_element(session_id, ok_button)

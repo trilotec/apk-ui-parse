@@ -12,7 +12,7 @@ Recommended local setup:
 
 ```properties
 # local.properties
-sdk.dir=D:\\AndroidSdk
+sdk.dir=/path/to/Android/Sdk
 ```
 
 Common commands:
