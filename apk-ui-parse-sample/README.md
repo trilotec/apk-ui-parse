@@ -1,22 +1,27 @@
 # apk-ui-parse-sample
 
-Android 宿主示例工程。
+Sample Android app for validating and demonstrating `APK UI Parse`.
 
-这是验证工程，不是主产品。
+## Purpose
 
-用于放置：
+- guides the user through accessibility and overlay permissions
+- demonstrates JSON dump export
+- demonstrates save and share actions
+- demonstrates the floating inspector
+- provides a real-device test target for manual and automated checks
 
-- 权限引导页面
-- 导出触发页面
-- JSON 展示或文件保存
-- 真机联调用例
+## Product Role
 
-开源仓库角色：
+This module is a demo app, not the main deliverable.
 
-- 演示如何接入 `apk-ui-parse-core` 和 `apk-ui-parse-android`
-- 用于真机测试和回归验证
-- 不作为最终交付物
+## Package Namespace
 
-建议包前缀：
+```text
+com.apkparse.sample
+```
 
-- `com.apkparse.sample`
+## Notes
+
+- use this app to verify the accessibility service on a real device
+- the floating inspector can inspect the current foreground UI across apps once permissions are enabled
+- Appium smoke scripts live under `tools/appium`

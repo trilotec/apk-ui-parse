@@ -1,119 +1,204 @@
 # APK UI Parse
 
-开源定位已经明确为：这是一个给 Android 宿主工程接入的 UI 解析库，不是一个独立交付的 APK。
+`APK UI Parse` is an Android UI inspection library that captures the current accessibility tree of the foreground app and exports it as JSON.
 
-仓库目标：
+This repository is designed as a multi-module Android project for open source distribution:
 
-- 主体交付物是可接入 Android 的 `jar` 或源码模块
-- 解析当前前台 APK 的顶层可访问 UI 树并输出 JSON
-- 基于 Java 开发
-- 提供一个 `sample` Demo App 仅用于真机测试、联调和示例接入
+- `apk-ui-parse-core`: pure Java models and JSON export
+- `apk-ui-parse-android`: Android accessibility integration
+- `apk-ui-parse-sample`: demo app for manual and device testing
 
-当前推荐的开源仓库形态：
+## What It Does
 
-- `apk-ui-parse-core`
-  - 纯 Java 核心模块
-  - 负责数据模型、字段规范化、JSON 导出
-  - 可直接发布为 `jar`
-- `apk-ui-parse-android`
-  - Android 接入模块
-  - 负责无障碍采集、节点遍历、快照导出
-  - 在 GitHub 仓库中以 Android library module 维护
-  - 可按需要产出 `jar`，但宿主仍需手工补 `AndroidManifest` 和无障碍配置
-- `apk-ui-parse-sample`
-  - 示例 App
-  - 只用于测试 SDK，不作为主要产品
+- Captures the top window from a running Android app through `AccessibilityService`
+- Walks the accessibility node tree and exports a structured JSON snapshot
+- Exposes node metadata such as package, activity, class, text, bounds, state flags, depth, and child structure
+- Includes a floating inspector demo for cross-app inspection on a real device
 
-推荐接入策略：
+## Important Scope
 
-- `apk-ui-parse-core`：发布 `jar`
-- `apk-ui-parse-android`：发布 `aar`
-- `apk-ui-parse-sample`：只发布调试用 `apk`
+This project does not read the target app's real `View` objects directly.
 
-关键约束：
+It inspects the Android accessibility tree, so the output depends on what the target app exposes through `AccessibilityNodeInfo`. Some values may be missing or normalized by the Android accessibility layer.
 
-- 解析其他正在运行的 APK，Android 上必须依赖 `AccessibilityService`
-- 普通 `jar` 不能携带 `AndroidManifest.xml`、`xml/accessibilityservice` 配置和 Android 资源
-- 因此真正适合 GitHub 开源维护的主形态是“多模块源码仓库”，而不是“只有一个 jar 文件”
-- 如果后续要让接入更省事，可以额外发布 `aar`，但当前设计仍以 `jar / module` 为主
+## Repository Layout
 
-建议下一步：
+### `apk-ui-parse-core`
 
-- 先搭好多模块工程骨架
-- 先实现 `apk-ui-parse-android` 的最小可用导出链路
-- 再整理 GitHub 开源所需的 `LICENSE`、`.gitignore`、发布说明和接入示例
+Pure Java module that contains:
 
-当前工程状态：
+- snapshot models
+- dump result models
+- JSON export logic
+- utility classes
+- unit tests
 
-- 已完成 Gradle 多模块工程骨架
-- 已完成 `apk-ui-parse-core` 的基础模型与 JSON 导出
-- 已完成 `apk-ui-parse-android` 的最小无障碍采集链路
-- 已完成 `apk-ui-parse-sample` 的演示入口、保存 JSON、分享 JSON
-- 已生成 `gradlew` / `gradlew.bat`
-- 已补充 `core` 基础单元测试
+Primary artifact:
 
-本地构建前提：
+- `jar`
+
+### `apk-ui-parse-android`
+
+Android library module that contains:
+
+- `AccessibilityService`
+- active window capture
+- node tree walking
+- field mapping from `AccessibilityNodeInfo`
+- Android-facing dump facade
+
+Primary artifact:
+
+- `aar`
+
+Secondary artifact:
+
+- classes-only `jar`
+
+`aar` is the recommended release format for this module because Android library metadata and manifest integration are not preserved in a plain `jar`.
+
+### `apk-ui-parse-sample`
+
+Sample app used for:
+
+- accessibility permission guidance
+- overlay permission guidance
+- JSON dump testing
+- floating inspector testing
+- real-device validation
+
+This module is not the main product.
+
+## Key Features
+
+- Top-window JSON dump
+- Accessibility-based cross-app inspection
+- Floating overlay inspector in the sample app
+- Save and share JSON from the sample app
+- GitHub Actions build and release workflows
+
+## Output Model
+
+The snapshot includes fields such as:
+
+- package name
+- activity name
+- class name
+- view id resource name
+- content and raw text
+- accessibility text, hint, tooltip, pane title
+- width and height
+- screen bounds and parent-relative bounds
+- parent and child node references
+- depth and drawing order
+- visibility and interaction flags
+
+Exact field coverage depends on Android API level and what the foreground app exposes through accessibility.
+
+## Requirements
 
 - JDK 17
 - Android SDK
-- 建议通过 `local.properties` 或环境变量配置 SDK 路径
+- Gradle wrapper included in this repository
+- A real Android device is strongly recommended for validation
 
-示例 `local.properties`：
+Optional local SDK file:
 
 ```properties
 sdk.dir=D:\\AndroidSdk
 ```
 
-常用命令：
+## Build
+
+Build the main artifacts:
 
 ```powershell
 ./gradlew :apk-ui-parse-core:jar
+./gradlew :apk-ui-parse-android:assembleRelease
 ./gradlew :apk-ui-parse-android:exportReleaseJar
 ./gradlew :apk-ui-parse-sample:assembleDebug
-./gradlew publishToMavenLocal
+```
+
+Run unit tests:
+
+```powershell
+./gradlew :apk-ui-parse-core:test
+```
+
+Publish to the local Maven repository:
+
+```powershell
+./gradlew :apk-ui-parse-core:publishReleasePublicationToMavenLocal
+./gradlew :apk-ui-parse-android:publishReleasePublicationToMavenLocal
+```
+
+Publish to the local build repo under `build/maven-repo`:
+
+```powershell
 ./gradlew publishReleasePublicationToLocalBuildRepoRepository
 ```
 
-当前已验证产物：
+## Release Assets
 
-- `apk-ui-parse-core/build/libs/apk-ui-parse-core.jar`
-- `apk-ui-parse-android/build/libs/apk-ui-parse-android-classes.jar`
-- `apk-ui-parse-android/build/outputs/aar/apk-ui-parse-android-release.aar`
-- `apk-ui-parse-sample/build/outputs/apk/debug/apk-ui-parse-sample-debug.apk`
+The GitHub release workflow uploads:
 
-示例输出：
+- `apk-ui-parse-core.jar`
+- `apk-ui-parse-core-sources.jar`
+- `apk-ui-parse-core-javadoc.jar`
+- `apk-ui-parse-android-release.aar`
+- `apk-ui-parse-android-classes.jar`
+- `apk-ui-parse-sample-debug.apk`
 
-- repository release artifact or sample runtime output
+Workflow files:
 
-GitHub Actions：
+- [build.yml](.github/workflows/build.yml)
+- [release.yml](.github/workflows/release.yml)
 
-- `.github/workflows/build.yml`
-- `.github/workflows/release.yml`
+Push a tag to trigger a release:
 
-发布说明：
-
-- `core` 和 `android` 都已接入 `maven-publish`
-- 可发布到 `mavenLocal()`
-- 也可发布到本地目录仓库 `build/maven-repo`
-
-接入示例：
-
-```gradle
-dependencies {
-    implementation "com.github.apk-ui-parse:apk-ui-parse-core:0.1.0-SNAPSHOT"
-    implementation "com.github.apk-ui-parse:apk-ui-parse-android:0.1.0-SNAPSHOT"
-}
+```powershell
+git tag v0.1.0
+git push origin v0.1.0
 ```
 
-开源协作文件：
+## Integration Notes
 
-- `CHANGELOG.md`
-- `CONTRIBUTING.md`
-- `CODE_OF_CONDUCT.md`
-- `SECURITY.md`
-- `.github/ISSUE_TEMPLATE/`
-- `.github/PULL_REQUEST_TEMPLATE.md`
+For actual Android app integration:
 
-私有资料说明：
+- prefer `apk-ui-parse-android` as an `aar` or source module
+- use `apk-ui-parse-core` as a `jar` when you only need the models/export layer
+- make sure the host app declares the accessibility service and required XML metadata when not consuming the Android module as an `aar`
 
-- `docs/` 目录用于本地设计与内部文档，不纳入公开仓库
+Current Gradle publication coordinates:
+
+```text
+com.github.apk-ui-parse:apk-ui-parse-core:0.1.0-SNAPSHOT
+com.github.apk-ui-parse:apk-ui-parse-android:0.1.0-SNAPSHOT
+```
+
+## Sample App
+
+The sample app supports:
+
+- starting a floating overlay tool
+- entering inspector mode
+- selecting nodes from the current foreground UI
+- saving and sharing JSON dumps
+
+The floating inspector was validated on a real device during development. The exact accessibility output still depends on target app behavior and device-specific system state.
+
+## Limitations
+
+- Cross-app inspection requires the user to enable the accessibility service
+- Overlay-based tooling requires overlay permission
+- Some apps intentionally hide or degrade accessibility data
+- Integer view IDs are not reliable across third-party apps; resource name strings are the practical stable identifier
+- Activity names come from accessibility window events and may lag briefly during transitions
+
+## Private Design Docs
+
+The local `docs/` directory is intentionally excluded from the public repository and is not part of the open-source surface.
+
+## License
+
+Apache-2.0. See [LICENSE](LICENSE).

@@ -1,22 +1,27 @@
 # apk-ui-parse-core
 
-纯 Java 核心模块。
+Pure Java core module for `APK UI Parse`.
 
-这是主产品的一部分，可独立发布为 `jar`。
+## Responsibilities
 
-用于放置：
+- defines snapshot models
+- defines dump result and option models
+- exports snapshots as JSON
+- contains utility code that does not require the Android SDK
+- hosts unit tests for the stable data/export layer
 
-- 通用数据模型
-- JSON 导出器
-- 字段规范化器
-- 与 Android 解耦的遍历结果结构
+## Recommended Distribution
 
-开源仓库角色：
+- `jar`
 
-- GitHub 主体模块
-- 负责稳定的数据结构和导出协议
-- 尽量不依赖 Android SDK，便于测试和发布
+## Package Namespace
 
-建议包前缀：
+```text
+com.apkparse.core
+```
 
-- `com.apkparse.core`
+## Notes
+
+- this module is intended to stay lightweight and testable
+- it can be published independently from the Android integration module
+- it is the best entry point when only the models and JSON export contract are needed

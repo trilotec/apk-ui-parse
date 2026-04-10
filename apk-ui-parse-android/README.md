@@ -1,22 +1,40 @@
 # apk-ui-parse-android
 
-Android 接入模块。
+Android integration layer for `APK UI Parse`.
 
-这是主产品的一部分，建议在 GitHub 仓库中以 Android library module 维护。
+## Responsibilities
 
-用于放置：
+- hosts the `AccessibilityService`
+- captures the active foreground window
+- walks the accessibility node tree
+- maps `AccessibilityNodeInfo` into repository snapshot models
+- exposes the Android-facing dump API
 
-- `AccessibilityService`
-- 前台窗口跟踪器
-- 根节点获取器
-- `AccessibilityNodeInfo` 到核心模型的字段映射器
+## Recommended Distribution
 
-开源仓库角色：
+Preferred format:
 
-- GitHub 主体模块
-- 提供 Android 侧接入能力
-- 可构建产出 `jar`，但宿主仍需补充 Manifest 和无障碍配置
+- `aar`
 
-建议包前缀：
+Optional format:
 
-- `com.apkparse.android`
+- classes-only `jar`
+
+Use the `aar` when possible. A plain `jar` cannot carry Android manifest entries, service declarations, or XML metadata required by accessibility integration.
+
+## Package Namespace
+
+```text
+com.apkparse.android
+```
+
+## Main Entry Points
+
+- `com.apkparse.android.facade.UiParse`
+- `com.apkparse.android.service.UiParseAccessibilityService`
+
+## Notes
+
+- this module depends on `apk-ui-parse-core`
+- cross-app inspection requires accessibility permission on the device
+- exported data depends on what the target app exposes through Android accessibility
