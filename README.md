@@ -1,12 +1,22 @@
 # APK UI Parse
 
-`APK UI Parse` is an Android UI inspection library that captures the current accessibility tree of the foreground app and exports it as JSON.
+[![Build](https://github.com/trilotec/apk-ui-parse/actions/workflows/build.yml/badge.svg)](https://github.com/trilotec/apk-ui-parse/actions/workflows/build.yml)
 
-This repository is designed as a multi-module Android project for open source distribution:
+`APK UI Parse` is an Android accessibility-based UI inspector and JSON dump library.
 
-- `apk-ui-parse-core`: pure Java models and JSON export
-- `apk-ui-parse-android`: Android accessibility integration
-- `apk-ui-parse-sample`: demo app for manual and device testing
+It captures the current foreground UI, walks the accessibility node tree, and exports structured node data such as package, activity, class, text, bounds, depth, and interaction flags.
+
+Use it when you need to:
+
+- inspect the current Android UI across apps
+- export accessibility trees to JSON
+- debug node metadata on a real device
+- build tooling around Android UI inspection
+
+## Downloads
+
+- [Latest Android library (`.aar`)](https://github.com/trilotec/apk-ui-parse/releases/latest/download/apk-ui-parse-android-release.aar)
+- [Latest sample app (`.apk`)](https://github.com/trilotec/apk-ui-parse/releases/latest/download/apk-ui-parse-sample-debug.apk)
 
 ## What It Does
 
@@ -15,9 +25,17 @@ This repository is designed as a multi-module Android project for open source di
 - Exposes node metadata such as package, activity, class, text, bounds, state flags, depth, and child structure
 - Includes a floating inspector demo for cross-app inspection on a real device
 
+## Screenshots
+
 ![Floating inspector overview](assets/inspector-overview.png)
 
 ![Selected node details](assets/inspector-selected-node.png)
+
+## Quick Start
+
+1. Download the latest sample app from the [Releases](https://github.com/trilotec/apk-ui-parse/releases) page.
+2. Enable the accessibility service and overlay permission.
+3. Start the floating inspector and tap the current foreground UI to inspect nodes.
 
 ## Important Scope
 
@@ -25,7 +43,11 @@ This project does not read the target app's real `View` objects directly.
 
 It inspects the Android accessibility tree, so the output depends on what the target app exposes through `AccessibilityNodeInfo`. Some values may be missing or normalized by the Android accessibility layer.
 
-## Repository Layout
+## Modules
+
+- `apk-ui-parse-core`: pure Java models and JSON export
+- `apk-ui-parse-android`: Android accessibility integration
+- `apk-ui-parse-sample`: demo app for manual and device testing
 
 ### `apk-ui-parse-core`
 
