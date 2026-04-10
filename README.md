@@ -15,9 +15,9 @@ This repository is designed as a multi-module Android project for open source di
 - Exposes node metadata such as package, activity, class, text, bounds, state flags, depth, and child structure
 - Includes a floating inspector demo for cross-app inspection on a real device
 
-![alt text](image.png)
+![Floating inspector overview](assets/inspector-overview.png)
 
-![alt text](image-1.png)
+![Selected node details](assets/inspector-selected-node.png)
 
 ## Important Scope
 
