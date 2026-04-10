@@ -1,0 +1,12 @@
+package com.apkparse.core.model;
+
+public enum DumpErrorCode {
+    NONE,
+    SERVICE_NOT_CONNECTED,
+    ROOT_NODE_NULL,
+    NO_ACTIVE_WINDOW,
+    PERMISSION_NOT_GRANTED,
+    WINDOW_CHANGED_DURING_CAPTURE,
+    CAPTURE_FAILED,
+    UNSUPPORTED
+}

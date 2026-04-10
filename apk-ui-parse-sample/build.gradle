@@ -1,0 +1,36 @@
+plugins {
+    id 'com.android.application' version '8.7.3'
+}
+
+android {
+    namespace 'com.apkparse.sample'
+    compileSdk rootProject.ext.compileSdk
+
+    defaultConfig {
+        applicationId 'com.apkparse.sample'
+        minSdk rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
+        versionCode 1
+        versionName '0.1.0'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.javaVersion
+        targetCompatibility rootProject.ext.javaVersion
+    }
+
+    lint {
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation project(':apk-ui-parse-android')
+    implementation 'androidx.core:core:1.13.1'
+}

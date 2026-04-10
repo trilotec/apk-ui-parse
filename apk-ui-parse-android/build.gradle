@@ -1,0 +1,90 @@
+plugins {
+    id 'com.android.library' version '8.7.3'
+    id 'maven-publish'
+}
+
+android {
+    namespace 'com.apkparse.android'
+    compileSdk rootProject.ext.compileSdk
+
+    defaultConfig {
+        minSdk rootProject.ext.minSdk
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility rootProject.ext.javaVersion
+        targetCompatibility rootProject.ext.javaVersion
+    }
+
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+        }
+    }
+
+    lint {
+        abortOnError false
+    }
+}
+
+dependencies {
+    api project(':apk-ui-parse-core')
+}
+
+tasks.register('exportReleaseJar', Jar) {
+    archiveClassifier.set('classes')
+    dependsOn 'compileReleaseJavaWithJavac'
+    from layout.buildDirectory.dir('intermediates/javac/release/compileReleaseJavaWithJavac/classes')
+}
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            artifactId = 'apk-ui-parse-android'
+
+            afterEvaluate {
+                from components.release
+            }
+
+            pom {
+                name = 'APK UI Parse Android'
+                description = 'Android accessibility-based UI dump library for APK UI Parse.'
+                url = providers.gradleProperty('POM_URL').get()
+
+                licenses {
+                    license {
+                        name = providers.gradleProperty('POM_LICENSE_NAME').get()
+                        url = providers.gradleProperty('POM_LICENSE_URL').get()
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = providers.gradleProperty('POM_DEVELOPER_ID').get()
+                        name = providers.gradleProperty('POM_DEVELOPER_NAME').get()
+                    }
+                }
+
+                scm {
+                    url = providers.gradleProperty('POM_SCM_URL').get()
+                    connection = providers.gradleProperty('POM_SCM_CONNECTION').get()
+                    developerConnection = providers.gradleProperty('POM_SCM_DEV_CONNECTION').get()
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = 'localBuildRepo'
+            url = uri(rootProject.layout.buildDirectory.dir('maven-repo'))
+        }
+    }
+}
