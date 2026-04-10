@@ -149,10 +149,6 @@ The floating inspector was validated on a real device during development. The ex
 - Integer view IDs are not reliable across third-party apps; resource name strings are the practical stable identifier
 - Activity names come from accessibility window events and may lag briefly during transitions
 
-## Private Design Docs
-
-The local `docs/` directory is intentionally excluded from the public repository and is not part of the open-source surface.
-
 ## License
 
 Apache-2.0. See [LICENSE](LICENSE).
